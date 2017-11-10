@@ -20,7 +20,7 @@ var BISON = require('bison');
 // var wss = expressWs.getWss('/chat/:roomId/user/:userId');
 
 // Test URL
-// ws://61.252.137.57:4300/chat/100/user/gyuhyeok
+// ws://localhost:4300/chat/100/user/gyuhyeok
 
 function ws_server(_port) {
 	port = _port;
