@@ -1,0 +1,210 @@
+
+<!DOCTYPE html>
+<html lang="kr">
+<head>
+<meta charset=utf-8>
+<meta name="viewport" content="width=device-width">
+<title>HTML5 Demo: Web Socket</title>
+<link rel="stylesheet" href="https://html5demos.com/css/html5demos.css">
+<script src="https://html5demos.com/js/h5utils.js"></script></head>
+
+<body>
+  <script type="text/javascript" src="js/lib/bison.js"></script>
+<section id="wrapper">
+<!-- <script async type="text/javascript" src="//cdn.carbonads.com/carbon.js?zoneid=1673&serve=C6AILKT&placement=html5demoscom" id="_carbonads_js"></script> -->
+    <header>
+      <h1>Web Socket</h1>
+    </header>
+
+<style>
+#chat { width: 95%; }
+.them { font-weight: bold; }
+.them:before { content: 'them '; color: #bbb; font-size: 14px; }
+.you { font-style: italic; }
+.you:before { content: 'you '; color: #bbb; font-size: 14px; font-weight: bold; }
+#log {
+  overflow: auto;
+  max-height: 300px;
+  list-style: none;
+  padding: 0;
+/*  margin: 0;*/
+}
+#log li {
+  border-top: 1px solid #ccc;
+  margin: 0;
+  padding: 10px 0;
+}
+#connect {
+  width: 75%;
+}
+.butt {
+  /*font-family: 'RixHead L'; */
+  font-size: 20px;
+  background-color: #c00;
+  color: white;
+}
+.butt.connect {
+  background-color: #0c0;
+}
+
+</style>
+<article>
+  <div>
+  <input type="text" id="connect" value="ws://61.252.137.57:4300/chat/100/user/44" placeholder="type and WebSocket URL enter to connect.." />
+  <input class="butt connect" id="button01" type="button" onclick="openConnection()" value="연결"/>
+  <input class="butt" id="button02" type="button" onclick="closeConnection()" value="해제"/>
+  </div>
+
+  <form>
+    <input type="text" id="chat" placeholder="type and press enter to chat" />
+  </form>
+  <p id="status">Not connected</p>
+  <p>Users connected: <span id="connected">0</span></p>
+  <p>Users list: <span id="userlist"></span></p>
+  <p>To test, open two windows with Web Socket support, type a message above and press return.</p>
+  <!-- <p>The server side code is available here: <a href="http://github.com/remy/html5demos/tree/master/server/">node-web-socket &amp; server</a> (note that it runs on <a href="http://nodejs.org/" title="node.js">nodejs</a>)</p> -->
+  <ul id="log"></ul>
+</article>
+<script>
+
+var state;
+// let's invite Firefox to the party.
+if (window.MozWebSocket) {
+  window.WebSocket = window.MozWebSocket;
+}
+
+function closeConnection() {
+    if (conn != undefined) {
+      state.className = 'fail';
+      state.innerHTML = 'Socket closed';
+      connected.innerHTML = '0';     
+      userlist.innerHTML = '';
+      log.innerHTML = '';
+      conn.close();
+    }
+};
+
+function openConnection() {
+  // uses global 'conn' object
+  if (conn.readyState === undefined || conn.readyState > 1) {
+    // conn = new WebSocket('wss://remy-ws.glitch.me/');
+
+    var ws_url = document.getElementById('connect').value;
+
+    conn = new WebSocket(ws_url);
+    conn.onopen = function () {
+      state.className = 'success';
+      state.innerHTML = 'Socket open';
+    };
+
+    conn.onmessage = function (event) {
+      // console.log(event.data);
+
+      // var BISON = require('./js/lib/bison');
+      var message = event.data; //JSON.parse(event.data);
+      // var message = BISON.decode(event.data);
+
+      console.log(message);
+
+      try {
+        var json = JSON.parse(message);
+        if(json.usercount) {
+            connected.innerHTML = json.usercount;     
+            userlist.innerHTML = json.userlist;
+          return;     
+        }
+      } catch(e) { }
+
+      if (!(/^\d+$/).test(message)) {
+        log.innerHTML = '<li class="them">' + message.replace(/[<>&]/g, function (m) { return entities[m]; }) + '</li>' + log.innerHTML;
+      } else {
+        connected.innerHTML = message;
+      }
+    };
+
+    conn.onclose = function (event) {
+      state.className = 'fail';
+      state.innerHTML = 'Socket closed';
+    };
+  }
+}
+
+var userlist = document.getElementById('userlist');
+
+var connected = document.getElementById('connected'),
+    log = document.getElementById('log'),
+    chat = document.getElementById('chat'),
+    button_connect = document.getElementById('button01');
+    form = chat.form,
+    conn = {},
+    state = document.getElementById('status'),
+    entities = {
+      '<' : '&lt;',
+      '>' : '&gt;',
+      '&' : '&amp;'
+    };
+
+if (window.WebSocket === undefined) {
+  state.innerHTML = 'Sockets not supported';
+  state.className = 'fail';
+} else {
+  state.onclick = function () {
+    if (conn.readyState !== 1) {
+      conn.close();
+      setTimeout(function () {
+        openConnection();
+      }, 250);
+    }
+  };
+
+  // addEvent(button_connect, 'keydown', function(event) {
+  //   event.preventDefault();
+  //   openConnection();
+  //   console.log(event);
+  // });
+
+  document.addEventListener("keydown", function(event) {
+    if(event.target.id == 'connect' && event.key == 'Enter') {
+      openConnection();
+    }
+  });
+
+  addEvent(form, 'submit', function (event) {
+    event.preventDefault();
+
+    // if we're connected
+    if (conn.readyState === 1) {
+      // conn.send(JSON.stringify(chat.value));
+      conn.send(chat.value);
+      log.innerHTML = '<li class="you">' + chat.value.replace(/[<>&]/g, function (m) { return entities[m]; }) + '</li>' + log.innerHTML;
+
+      chat.value = '';
+    }
+  });
+
+  // openConnection();
+}
+
+</script>
+<a id="html5badge" href="http://www.w3.org/html/logo/">
+<img src="https://www.w3.org/html/logo/badge/html5-badge-h-connectivity-device-graphics-multimedia-performance-semantics-storage.png" width="325" height="64" alt="HTML5 Powered with Connectivity / Realtime, Device Access, Graphics, 3D &amp; Effects, Multimedia, Performance &amp; Integration, Semantics, and Offline &amp; Storage" title="HTML5 Powered with Connectivity / Realtime, Device Access, Graphics, 3D &amp; Effects, Multimedia, Performance &amp; Integration, Semantics, and Offline &amp; Storage">
+</a>
+    <footer><a href="/">HTML5 demos</a>/<a id="built" href="http://twitter.com/rem">@rem built this</a>/<a href="#view-source">view source</a></footer>
+</section>
+<!-- <a id="forkme" href="http://github.com/remy/html5demos"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_left_darkblue_121621.png" alt="Fork me on GitHub" /></a>
+<script src="/js/prettify.packed.js"></script> -->
+<!-- <script>
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script> -->
+<script>
+  try {
+    var pageTracker = _gat._getTracker("UA-1656750-18");
+    pageTracker._trackPageview();
+  } catch(err) {}
+
+</script>
+
+ 
+</body>
+</html>

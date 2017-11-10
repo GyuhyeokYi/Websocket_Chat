@@ -1,0 +1,164 @@
+<!DOCTYPE HTML>
+<html>
+   <head>
+      <meta charset="utf-8" />
+      <title>WebSocket테스트페이지</title>
+      <script type="text/javascript" src="js/websocket_client.js?v=102;"></script>
+      <!-- <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script> -->
+	
+      <script type="text/javascript">
+         // setTimeout(openConfirm, 30000);
+
+         function openConfirm() {
+            var res = confirm('Websocket 테스트를 진행할까요?');
+            if(res == true) {
+               WebSocketTest();
+            } else {
+               document.getElementById('button01').focus();
+            }
+         }
+
+         // function openConfirm2() {
+         //    swal({
+         //      title: "WS 테스트",
+         //      text: "Webscoket 테스트를 진행할까요?",
+         //      icon: "warning",
+         //      buttons: true,
+         //      dangerMode: true,
+         //    })
+         //    .then((process) => {
+         //      if (process) {
+         //        // swal("테스트를 시작합니다.", {
+         //        //   icon: "success", 
+         //        // });
+         //        WebSocketTest();
+         //      } else {
+         //        // swal("Your imaginary file is safe!"); 
+         //        document.getElementById('button01').focus();
+         //      }
+         //    });
+         // }
+
+         function WebSocketTest() {
+
+            var host = '61.252.137.57';
+
+            // var ws_client1 = WebSocketClient(host, '4300', 'echo', 1000, function(data) {
+            //    document.getElementById("info1").innerHTML = data;
+            // });
+            // var ws_client2 = WebSocketClient(host, '4400', 'echo', 3500, function(data) {
+            //    var info = document.getElementById("info2").innerHTML = data;
+            // });
+
+            var ws_client1 = WebSocketClient(host, '4300', 'chat/100/user/gyuhyeok', 1000, function(data) {
+               document.getElementById("info1").innerHTML = data;
+            });
+
+
+         };
+         /*
+         var ws;
+         function sendNumber() {
+           if (ws.readyState == 1) {
+               var number = Math.round(Math.random() * 0xFFFFFF);
+               ws.send(number.toString());
+               setTimeout(sendNumber, 1000);
+           }
+         }
+
+         function WebSocketTest()
+         {
+            if ("WebSocket" in window)
+            {
+               alert("WebSocket is supported by your Browser!");
+               
+               // Let us open a web socket
+               ws = new WebSocket("ws://localhost:3000/echo");
+				
+               ws.onopen = function()
+               {
+                  // Web Socket is connected, send data using send()
+                  ws.send("Message to send");
+                  alert("Message is sent... and send number...");
+                  sendNumber();
+               };
+				
+               ws.onmessage = function (evt) 
+               { 
+                  var received_msg = evt.data;
+                  // alert("Message is received...");
+                  console.log('onmessage() = ' + received_msg);
+               };
+				
+               ws.onclose = function()
+               { 
+                  // websocket is closed.
+                  alert("Connection is closed..."); 
+               };
+					
+               window.onbeforeunload = function(event) {
+                  socket.close();
+               };
+            }
+            
+            else
+            {
+               // The browser doesn't support WebSocket
+               alert("WebSocket NOT supported by your Browser!");
+            }
+         }
+         */
+      </script>
+		<style type="text/css">
+      body {
+         background-color: white;
+         /*font-family: ;*/
+         font-family: 'RixHead L'; font-size: 24px;
+         text-shadow: 2px 10px 1px gray;
+      } 
+      div {
+          /*border: 1px solid black;*/
+          margin-top: 20px;
+          margin-bottom: 20px;
+          margin-right: 50px;
+          margin-left: 80px;
+          /*background-color: lightblue;*/
+      }
+      input {
+         font-family: 'RixHead L'; font-size: 20px;
+      }
+      </style>
+   </head>
+   <body>
+   
+      <div id="sse">
+         <a href="javascript:openConfirm()">Run WebSocket</a>
+         <input id="button01" type="button" onclick="openConfirm()" value="실행">
+      </div>
+
+      <div id="info1">
+         WebSocket One received_message...
+      </div>
+      <div id="info2">
+         WebSocket Two received_message...
+      </div>
+      <script type="text/javascript">         
+         window.onload = function() {
+             // swal("Hello world!");
+             if (typeof oipfObjectFactory != 'undefined') {
+               var appMgr = oipfObjectFactory.createApplicationManagerObject();
+               var thisApp = appMgr.getOwnerApplication(window.document);
+               thisApp.activateInput(true); // This function makes this application receive events
+            }
+
+            document.getElementById('button01').focus();
+            document.addEventListener('keydown', function(keyEvent) {
+               if (keyEvent.keyCode == 13) {
+                   keyEvent.stopPropagation();
+                }           
+            });
+         };
+      </script>
+      
+   </body>
+</html>

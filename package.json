@@ -1,0 +1,16 @@
+{
+  "name": "websocket_app",
+  "version": "1.0.0",
+  "description": "WebSocket Server Application",
+  "main": "app.js",
+  "scripts": {
+    "test": "node ws_server.js",
+    "start": "node app.js"
+  },
+  "author": "gyuh",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.15.4",
+    "express-ws": "^3.0.0"
+  }
+}
